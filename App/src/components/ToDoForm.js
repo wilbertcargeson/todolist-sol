@@ -1,12 +1,34 @@
 import { useState } from "react";
 import { Grid, Stack, TextField, Button } from "@mui/material";
 
-const ToDoForm = () => {
+import Web3 from "web3";
+import { WEB3_LOCAL_URL, TO_DO_LIST_ABI, TO_DO_LIST_ADDRESS } from "../config";
+
+const ToDoForm = ({ account, refreshTableFunction }) => {
   const [author, setAuthor] = useState("");
   const [content, setContent] = useState("");
 
-  const createButtonOnClickHandler = () => {
-    alert(`${author}${content}`);
+  const resetInputs = () => {
+    setAuthor("");
+    setContent("");
+  };
+
+  const createButtonOnClickHandler = async () => {
+    const web3 = new Web3(Web3.givenProvider || WEB3_LOCAL_URL);
+    const contract = await new web3.eth.Contract(
+      TO_DO_LIST_ABI,
+      TO_DO_LIST_ADDRESS
+    );
+
+    console.log(content, author);
+
+    const create = await contract.methods
+      .createTask(content, author)
+      .send({ from: account });
+
+    console.log(create);
+    refreshTableFunction();
+    resetInputs();
   };
 
   return (

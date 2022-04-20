@@ -64,4 +64,9 @@ contract ToDo {
         }
         _;
     }
+
+    // Getter for last id
+    function getLastId() public view returns (uint256) {
+        return lastId;
+    }
 }

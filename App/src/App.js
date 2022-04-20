@@ -2,26 +2,37 @@ import { useEffect, useState } from "react";
 import ToDoForm from "./components/ToDoForm";
 import "./App.css";
 import ToDoTable from "./components/ToDoTable";
-
-const WEB3_LOCAL_URL = "http://localhost:7545";
+import Web3 from "web3";
+import { WEB3_LOCAL_URL } from "./config";
+import { Box } from "@mui/material";
 
 const App = () => {
-  const [account, setAccount] = useState();
+  const [account, setAccount] = useState("");
+  const [toRefreshTable, setToRefreshTable] = useState(0);
 
   useEffect(() => {
-    // async function load() {
-    //   const web3 = new Web3(Web3.givenProvider || WEB3_LOCAL_URL);
-    //   const accounts = await web3.eth.requestAccounts();
-    //   setAccount(accounts[0]);
-    // }
-    // load();
+    async function loadBlockchain() {
+      const web3 = new Web3(Web3.givenProvider || WEB3_LOCAL_URL);
+      const accounts = await web3.eth.requestAccounts();
+      console.log(accounts);
+      setAccount(accounts[0]);
+    }
+    loadBlockchain();
   }, []);
 
   return (
     <>
       <div>Your account is: {account}</div>
-      <ToDoForm />
-      <ToDoTable />
+      <br />
+      <Box>
+        <ToDoForm
+          account={account}
+          refreshTableFunction={() => {
+            setToRefreshTable(toRefreshTable + 1);
+          }}
+        />
+      </Box>
+      <ToDoTable refresh={toRefreshTable} />
     </>
   );
 };
