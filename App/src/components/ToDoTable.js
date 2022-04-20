@@ -12,8 +12,9 @@ import {
 import Web3 from "web3";
 import { WEB3_LOCAL_URL, TO_DO_LIST_ABI, TO_DO_LIST_ADDRESS } from "../config";
 
-const ToDoTable = ({ refresh }) => {
+const ToDoTable = ({ refresh, account }) => {
   const [todolist, setTodolist] = useState([]);
+  const [refreshComponentVar, refreshComponent] = useState(0);
 
   useEffect(() => {
     const loadTodolist = async () => {
@@ -39,21 +40,27 @@ const ToDoTable = ({ refresh }) => {
       setTodolist(todolistFromEth);
     };
     loadTodolist();
-  }, [refresh]);
+  }, [refreshComponentVar, account, refresh]);
 
-  const completeToDo = (e) => {
-    // Set to do list to complete in DB
-    // data[0].done = e.target.checked;
+  const refreshfn = () => {
+    refreshComponent((refresh) => refresh + 1);
   };
 
-  const setDone = () => {};
+  const toggleToDo = async (taskId) => {
+    const web3 = new Web3(Web3.givenProvider || WEB3_LOCAL_URL);
+    const contract = await new web3.eth.Contract(
+      TO_DO_LIST_ABI,
+      TO_DO_LIST_ADDRESS
+    );
+    await contract.methods.toggleTask(taskId).send({ from: account });
+    refreshfn();
+  };
 
   return (
     <Box id="todotable-container">
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>ID</TableCell>
             <TableCell>Date</TableCell>
             <TableCell>Content</TableCell>
             <TableCell>Author</TableCell>
@@ -62,15 +69,18 @@ const ToDoTable = ({ refresh }) => {
         </TableHead>
         <TableBody>
           {todolist.map((todoitem, index) => (
-            <TableRow key={index}>
-              <TableCell>{todoitem[0]}</TableCell>
+            <TableRow key={todoitem[0]}>
+              {/* <TableCell>{todoitem[0]}</TableCell> */}
               <TableCell>{todoitem[1]}</TableCell>
               <TableCell>{todoitem[2]}</TableCell>
               <TableCell>{todoitem[3]}</TableCell>
               <TableCell>
                 <Checkbox
                   checked={todoitem[4]}
-                  onChange={(e) => setDone(e.target.checked)}
+                  onChange={(e) => {
+                    todoitem[4] = e.target.value;
+                    toggleToDo(todoitem[0]);
+                  }}
                 ></Checkbox>
               </TableCell>
             </TableRow>

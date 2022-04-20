@@ -32,7 +32,7 @@ const App = () => {
           }}
         />
       </Box>
-      <ToDoTable refresh={toRefreshTable} />
+      <ToDoTable account={account} refresh={toRefreshTable} />
     </>
   );
 };

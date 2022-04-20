@@ -1,6 +1,6 @@
 export const WEB3_LOCAL_URL = "http://localhost:7545";
 
-export const TO_DO_LIST_ADDRESS = "0x90AaB9f78B39E58ed54F246ee364bD343B3E73B0";
+export const TO_DO_LIST_ADDRESS = "0xF7772eE937Aa43354FaE73939Ca21cC7a00E6252";
 
 export const TO_DO_LIST_ABI = [
   {
@@ -43,6 +43,25 @@ export const TO_DO_LIST_ABI = [
       },
     ],
     name: "TaskCreated",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    name: "TaskToggled",
     type: "event",
   },
   {
@@ -130,5 +149,18 @@ export const TO_DO_LIST_ABI = [
     stateMutability: "view",
     type: "function",
     constant: true,
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "id",
+        type: "uint256",
+      },
+    ],
+    name: "toggleTask",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
 ];

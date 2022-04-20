@@ -21,6 +21,7 @@ contract ToDo {
     }
 
     event TaskCreated(uint256, uint256, string, string, bool);
+    event TaskToggled(uint256, bool);
 
     // Create a new task
     function createTask(string memory _content, string memory _author) public {
@@ -68,5 +69,12 @@ contract ToDo {
     // Getter for last id
     function getLastId() public view returns (uint256) {
         return lastId;
+    }
+
+    function toggleTask(uint256 id) public tasksExists(id) {
+        Task memory task = tasks[id];
+        task.done = !tasks[id].done;
+        tasks[id] = task;
+        emit TaskToggled(id, task.done);
     }
 }
