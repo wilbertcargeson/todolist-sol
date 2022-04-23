@@ -22,7 +22,7 @@ const App = () => {
 
   return (
     <>
-      <div>Your account is: {account}</div>
+      <h2>Your account is: {account}</h2>
       <br />
       <Box>
         <ToDoForm

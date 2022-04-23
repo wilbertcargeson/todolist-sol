@@ -22,6 +22,7 @@ contract ToDo {
 
     event TaskCreated(uint256, uint256, string, string, bool);
     event TaskToggled(uint256, bool);
+    event TaskDeleted(uint256);
 
     // Create a new task
     function createTask(string memory _content, string memory _author) public {
@@ -71,10 +72,17 @@ contract ToDo {
         return lastId;
     }
 
+    // Toggle task as completed or not
     function toggleTask(uint256 id) public tasksExists(id) {
         Task memory task = tasks[id];
         task.done = !tasks[id].done;
         tasks[id] = task;
         emit TaskToggled(id, task.done);
+    }
+
+    // Deletes the task
+    function deleteTask(uint256 id) public tasksExists(id) {
+        delete tasks[id];
+        emit TaskDeleted(id);
     }
 }

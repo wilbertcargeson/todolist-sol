@@ -7,16 +7,19 @@ import {
   TableCell,
   Box,
   Checkbox,
+  IconButton,
 } from "@mui/material";
 
 import Web3 from "web3";
 import { WEB3_LOCAL_URL, TO_DO_LIST_ABI, TO_DO_LIST_ADDRESS } from "../config";
+import Delete from "@mui/icons-material/Delete";
 
 const ToDoTable = ({ refresh, account }) => {
   const [todolist, setTodolist] = useState([]);
   const [refreshComponentVar, refreshComponent] = useState(0);
 
   useEffect(() => {
+    // Load list of appropriate todolist
     const loadTodolist = async () => {
       const web3 = new Web3(Web3.givenProvider || WEB3_LOCAL_URL);
       const contract = await new web3.eth.Contract(
@@ -37,7 +40,13 @@ const ToDoTable = ({ refresh, account }) => {
           }
         })
       );
-      setTodolist(todolistFromEth);
+
+      setTodolist(
+        todolistFromEth.filter(
+          (e) => e !== undefined && e !== null && e[3] === account
+        )
+      );
+      console.log(todolist);
     };
     loadTodolist();
   }, [refreshComponentVar, account, refresh]);
@@ -56,24 +65,39 @@ const ToDoTable = ({ refresh, account }) => {
     refreshfn();
   };
 
+  const deleteToDo = async (taskId) => {
+    const web3 = new Web3(Web3.givenProvider || WEB3_LOCAL_URL);
+    const contract = await new web3.eth.Contract(
+      TO_DO_LIST_ABI,
+      TO_DO_LIST_ADDRESS
+    );
+    await contract.methods.deleteTask(taskId).send({ from: account });
+    refreshfn();
+  };
+
+  const toDateTimeString = (epochS_str) => {
+    const date = new Date(parseInt(epochS_str) * 1000);
+    return date.toLocaleString();
+  };
+
   return (
     <Box id="todotable-container">
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Date</TableCell>
             <TableCell>Content</TableCell>
-            <TableCell>Author</TableCell>
+            <TableCell>Date</TableCell>
             <TableCell>Done</TableCell>
+            <TableCell>Action</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {todolist.map((todoitem, index) => (
             <TableRow key={todoitem[0]}>
-              {/* <TableCell>{todoitem[0]}</TableCell> */}
-              <TableCell>{todoitem[1]}</TableCell>
-              <TableCell>{todoitem[2]}</TableCell>
-              <TableCell>{todoitem[3]}</TableCell>
+              <TableCell>
+                <b>{todoitem[2]}</b>
+              </TableCell>
+              <TableCell>{toDateTimeString(todoitem[1])}</TableCell>
               <TableCell>
                 <Checkbox
                   checked={todoitem[4]}
@@ -82,6 +106,15 @@ const ToDoTable = ({ refresh, account }) => {
                     toggleToDo(todoitem[0]);
                   }}
                 ></Checkbox>
+              </TableCell>
+              <TableCell>
+                <IconButton
+                  onClick={() => {
+                    deleteToDo(todoitem[0]);
+                  }}
+                >
+                  <Delete />
+                </IconButton>
               </TableCell>
             </TableRow>
           ))}

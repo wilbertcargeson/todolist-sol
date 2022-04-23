@@ -5,11 +5,9 @@ import Web3 from "web3";
 import { WEB3_LOCAL_URL, TO_DO_LIST_ABI, TO_DO_LIST_ADDRESS } from "../config";
 
 const ToDoForm = ({ account, refreshTableFunction }) => {
-  const [author, setAuthor] = useState("");
   const [content, setContent] = useState("");
 
   const resetInputs = () => {
-    setAuthor("");
     setContent("");
   };
 
@@ -20,10 +18,8 @@ const ToDoForm = ({ account, refreshTableFunction }) => {
       TO_DO_LIST_ADDRESS
     );
 
-    console.log(content, author);
-
     const create = await contract.methods
-      .createTask(content, author)
+      .createTask(content, account)
       .send({ from: account });
 
     console.log(create);
@@ -33,13 +29,10 @@ const ToDoForm = ({ account, refreshTableFunction }) => {
 
   return (
     <Grid container spacing={1}>
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={0} sm={4} />
+      <Grid item xs={12} sm={4} id="todoform-container">
         <Stack spacing={1}>
-          <TextField
-            label="Author"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-          ></TextField>
+          <h4>Create new item</h4>
           <TextField
             label="Content"
             value={content}
